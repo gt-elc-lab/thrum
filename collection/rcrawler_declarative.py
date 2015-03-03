@@ -22,6 +22,7 @@ class Comment(Base):
     body = Column(String(10000), nullable=True)
     ups = Column(Integer, nullable=False)
     downs = Column(Integer, nullable=False)
+    post_id = Column(String(10), ForeignKey('post.id'))
     post = relationship(Post)
 
 engine = create_engine("mysql+mysqldb://root:rtrad@localhost/yaks")
