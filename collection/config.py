@@ -1,0 +1,21 @@
+SUBREDDITS =  [
+    'gatech',
+    'OSU',
+    'aggies',
+    'ucf',
+    'berkeley',
+    'mcgill',
+    'rit',
+    'ucsantabarbara',
+    'UTAustin',
+    'purdue',
+    'yorku',
+    'CalPoly',
+    'ncsu',
+    'PennStateUniversity',
+    'UMD',
+    'UGA',
+    'ucsd',
+    'asu',
+    'UBC'
+]
