@@ -1,5 +1,6 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
+import flask.ext.whooshalchemy as whooshalchemy
 
 DATABASE_URI = 'mysql://root:password@localhost/proto_thrum' 
 app = Flask(__name__)
@@ -7,7 +8,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db = SQLAlchemy(app)
 
 class Post(db.Model):
-    
+    __searchable__ = ['title', 'text']
+
     id = db.Column(db.String(10), primary_key=True)
     title = db.Column(db.String(10000), nullable=False)
     text = db.Column(db.String(10000), nullable=True)
@@ -27,7 +29,11 @@ class Post(db.Model):
         return '<Post {}>'.format(self.title)
 
 
+
+
 class Comment(db.Model):
+
+    __searchable__ = ['body']
 
     id = db.Column(db.String(10), primary_key=True)
     body = db.Column(db.String(10000), nullable=True)
@@ -47,3 +53,5 @@ class Comment(db.Model):
     def __repr__(self):
         return '<Comment {}>'.format(self.body) 
 
+whooshalchemy.whoosh_index(app, Post)
+whooshalchemy.whoosh_index(app, Post)

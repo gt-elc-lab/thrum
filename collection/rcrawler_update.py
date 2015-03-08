@@ -19,15 +19,18 @@ def main():
         db.session.commit()
         comments = praw.helpers.flatten_tree(submission.comments)
         for comment in comments:
-            print "Getting Comment for: {}".format(submission.title)
-            new_comment = Comment(id=comment.id, 
-                                  body=comment.body.encode('utf-8'), 
-                                  ups=comment.ups, 
-                                  downs=comment.downs,
-                                  post_id=submission.id ,
-                                  post=new_post)
-            db.session.merge(new_comment)
-            db.session.commit()
+            try:
+                print "Getting Comment for: {}".format(submission.title)
+                new_comment = Comment(id=comment.id, 
+                                      body=comment.body.encode('utf-8'), 
+                                      ups=comment.ups, 
+                                      downs=comment.downs,
+                                      post_id=submission.id ,
+                                      post=new_post)
+                db.session.merge(new_comment)
+                db.session.commit()
+            except AttributeError:
+                pass
 
 if __name__ == '__main__':
     main()
