@@ -1,29 +1,42 @@
 import praw
 import time
-from pprint import pprint
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from rcrawler_declarative import Post, Comment, Base
-from config import SUBREDDITS
+from models import db, Post, Comment
+from config import SUBREDDITS, USERNAME, PASSWORD
 
-engine = create_engine("mysql+mysqldb://root:rtrad@localhost/reddit")
-Base.metadata.bind = engine
 
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
+def main():
+    reddit = praw.Reddit('PRAW Gatech subreddit monitor')
+    reddit.login(USERNAME, PASSWORD)
+    for school, subreddit in SUBREDDITS.itervalues():
+        posts = reddit.get_subreddit(subreddit)
+        crawl_subreddit(posts.get_new(limit=30), school, subreddit )
+    
 
-r = praw.Reddit('PRAW Gatech subreddit monitor')
-r.login()
-
-for subreddit in SUBREDDITS:
-    print 'Scraping r/{}'.format(subreddit)
-    subredditdata = r.get_subreddit(subreddit)
-    for submission in subredditdata.get_new(limit=30):
-        new_post = Post(id=submission.id, title=submission.title.encode('utf-8'), text=submission.selftext.encode('utf-8'), url=submission.url, ups=submission.ups, downs=submission.downs, subreddit=subreddit)
-        session.merge(new_post)
-        session.commit()
+def crawl_subreddit(posts, school, subreddit):
+    for submission in posts:
+        print "Getting submission:  {}".format(submission.title)
+        new_post = Post(id=submission.id, 
+                        title=submission.title, 
+                        text=submission.selftext.encode('utf-8'),
+                        url=submission.url, 
+                        ups=submission.ups, 
+                        downs=submission.downs,
+                        subreddit=subreddit,
+                        college=school)
+        db.session.merge(new_post)
+        db.session.commit()
         comments = praw.helpers.flatten_tree(submission.comments)
         for comment in comments:
-            new_comment = Comment(id=comment.id, body=comment.body.encode('utf-8'), ups=comment.ups, downs=comment.downs, post=new_post)
-            session.merge(new_comment)
-            session.commit()
+            print "Getting Comment for: {}".format(submission.title)
+            new_comment = Comment(id=comment.id, 
+                                  body=comment.body.encode('utf-8'), 
+                                  ups=comment.ups, 
+                                  downs=comment.downs,
+                                  post_id=submission.id,
+                                  post=new_post)
+            db.session.merge(new_comment)
+            db.session.commit()
+
+if __name__ == '__main__':
+    main()
+

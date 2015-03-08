@@ -1,15 +1,60 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
+import flask.ext.whooshalchemy as whooshalchemy
 
-DATABASE_URI = None
+DATABASE_URI = 'mysql://root:password@localhost/proto_thrum' 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db = SQLAlchemy(app)
 
-class Model(db.model):
+class Post(db.Model):
+    __searchable__ = ['title', 'text']
 
-    def __init__(self):
-        pass
+    id = db.Column(db.String(10), primary_key=True)
+    title = db.Column(db.String(10000), nullable=False)
+    text = db.Column(db.String(10000), nullable=True)
+    url = db.Column(db.String(1000), nullable=True)
+    ups = db.Column(db.Integer, nullable=False)
+    downs = db.Column(db.Integer, nullable=False)
+    subreddit = db.Column(db.String(1000), nullable=False)
+
+    def __init__(self, id, title, text, url, ups, downs, subreddit, college):
+        self.id = id
+        self.title  = title
+        self.text = text
+        self.url = url
+        self.ups = ups
+        self.downs = downs
+        self.subreddit = subreddit
+        self.college = college
 
     def __repr__(self):
-        pass
+        return '<Post {}>'.format(self.title)
+
+
+
+
+class Comment(db.Model):
+
+    __searchable__ = ['body']
+
+    id = db.Column(db.String(10), primary_key=True)
+    body = db.Column(db.String(10000), nullable=True)
+    ups = db.Column(db.Integer, nullable=False)
+    downs = db.Column(db.Integer, nullable=False)
+    post_id = db.Column(db.String(10), db.ForeignKey('post.id'))
+    post = db.relationship(Post)
+    
+    def __init__(self, id, body, ups, downs, post_id, post):
+        self.id = id
+        self.body = body
+        self.ups = ups
+        self.downs = downs
+        self.post_id = post_id
+        self.post = post
+
+    def __repr__(self):
+        return '<Comment {}>'.format(self.body) 
+
+whooshalchemy.whoosh_index(app, Post)
+whooshalchemy.whoosh_index(app, Post)
