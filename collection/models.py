@@ -1,5 +1,6 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
+from datetime import datetime 
 
 DATABASE_URI = 'mysql://root:password@localhost/proto_thrum' 
 app = Flask(__name__)
@@ -15,8 +16,12 @@ class Post(db.Model):
     downs = db.Column(db.Integer, nullable=False)
     subreddit = db.Column(db.String(1000), nullable=False)
     college = db.Column(db.String(1000), nullable=False)
+    time_stamp = db.Column(db.DateTime, default=datetime.now())
+    created = db.Column(db.DateTime, nullable=False)
+    modified = db.Column(db.DateTime, default=datetime.now())
 
-    def __init__(self, id, title, text, url, ups, downs, subreddit, college):
+
+    def __init__(self, id, title, text, url, ups, downs, subreddit, college, create_utc):
         self.id = id
         self.title  = title
         self.text = text
@@ -25,9 +30,10 @@ class Post(db.Model):
         self.downs = downs
         self.subreddit = subreddit
         self.college = college
+        self.created = datetime.utcfromtimestamp(create_utc)
 
     def __repr__(self):
-        return '<Post {}>'.format(self.title)
+        return '<Post %s>' % self.title
 
 
 class Comment(db.Model):
@@ -37,15 +43,19 @@ class Comment(db.Model):
     downs = db.Column(db.Integer, nullable=False)
     post_id = db.Column(db.String(10), db.ForeignKey('post.id'))
     post = db.relationship(Post)
+    time_stamp = db.Column(db.DateTime, default=datetime.now())
+    modified = db.Column(db.DateTime, default=datetime.now())
+    created = db.Column(db.DateTime, nullable=False)
     
-    def __init__(self, id, body, ups, downs, post_id, post):
+    def __init__(self, id, body, ups, downs, post_id, post, create_utc):
         self.id = id
         self.body = body
         self.ups = ups
         self.downs = downs
         self.post_id = post_id
         self.post = post
+        self.created = datetime.utcfromtimestamp(create_utc)
 
     def __repr__(self):
-        return '<Comment {}>'.format(self.body) 
+        return '<Comment %s>' % self.body 
 
