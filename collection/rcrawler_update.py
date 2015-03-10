@@ -18,7 +18,7 @@ def main():
 def crawl_subreddit(posts, school, subreddit):
     for submission in posts:
         new_post = Post(id=submission.id, 
-                        title=submission.title, 
+                        title=submission.title.encode('utf-8'),
                         text=submission.selftext.encode('utf-8'),
                         url=submission.url, 
                         ups=submission.ups, 
