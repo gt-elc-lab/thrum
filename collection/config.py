@@ -1,5 +1,5 @@
 SUBREDDITS =  {
-    'Georgia Tech':' gatech',
+    'Georgia Tech':'gatech',
     'Ohio State University':'OSU',
     'Texas A&M': 'aggies',
     'University of Central Florida':'ucf',
