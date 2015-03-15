@@ -5,6 +5,9 @@ from datetime import datetime
 
 
 def main():
+    """
+        Runs the crawler    
+    """
     reddit = praw.Reddit('PRAW Gatech subreddit monitor')
     print "Logging in"
     reddit.login(USERNAME, PASSWORD)
@@ -19,9 +22,17 @@ def main():
         print output.format(school, subreddit, num_posts, num_comments, 
                                                         duration.seconds)
     print "Done"
-    
 
 def crawl_subreddit(posts, school, subreddit):
+    """
+        Args:
+            posts: posts obtained from reddit
+            school:  the name of the school
+            subreddit: the name of the subreddit
+        
+        Returns:
+            (num_posts, num_comments) : the number of posts and comments 
+    """
     num_posts = 0
     num_comments = 0
     try: 

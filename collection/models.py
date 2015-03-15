@@ -8,6 +8,22 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 db = SQLAlchemy(app)
 
 class Post(db.Model):
+    """sqlalchemy Post object.
+
+    Attributes:
+      id (str):
+      title (str):
+      text (str):
+      url (str):
+      ups (int):
+      downs (int):
+      subreddit (str):
+      college (str):
+      time_stamp (datetime):
+      created (datetime):
+      modified (datetime):
+
+    """
     id = db.Column(db.String(10), primary_key=True)
     title = db.Column(db.String(10000), nullable=False)
     text = db.Column(db.String(10000), nullable=True)
@@ -22,6 +38,21 @@ class Post(db.Model):
 
 
     def __init__(self, id, title, text, url, ups, downs, subreddit, college, create_utc):
+         """
+            Args:
+              id (str):
+              title (str):
+              text (str):
+              url (str):
+              ups (int):
+              downs (int):
+              subreddit (str):
+              college (str):
+              time_stamp (datetime):
+              created (datetime):
+              modified (datetime):
+
+        """
         self.id = id
         self.title  = title
         self.text = text
@@ -33,10 +64,25 @@ class Post(db.Model):
         self.created = datetime.utcfromtimestamp(create_utc)
 
     def __repr__(self):
+        """ String representation of a post object """
         return '<Post %s>' % self.title
 
 
 class Comment(db.Model):
+    """sqlalchemy Comment object.
+
+    Attributes:
+        id (str):
+        body (str):
+        ups (int):
+        downs (int):
+        post_id (str):
+        post (sqlalchemy relationship):
+        post_id (str):
+        time_stamp (datetime):
+        modified (datetime):
+        created (datetime):
+    """
     id = db.Column(db.String(10), primary_key=True)
     body = db.Column(db.String(10000), nullable=True)
     ups = db.Column(db.Integer, nullable=False)
@@ -48,6 +94,19 @@ class Comment(db.Model):
     created = db.Column(db.DateTime, nullable=False)
     
     def __init__(self, id, body, ups, downs, post_id, post, create_utc):
+        """
+        Args:
+            id (str):
+            body (str):
+            ups (int):
+            downs (int):
+            post_id (str):
+            post (sqlalchemy relationship):
+            post_id (str):
+            time_stamp (datetime):
+            modified (datetime):
+            created (datetime):
+        """
         self.id = id
         self.body = body
         self.ups = ups
@@ -57,5 +116,6 @@ class Comment(db.Model):
         self.created = datetime.utcfromtimestamp(create_utc)
 
     def __repr__(self):
+        """ String representation of a comment object"""
         return '<Comment %s>' % self.body 
 
