@@ -38,6 +38,7 @@ class Post(db.Model):
 
 
     def __init__(self, id, title, text, url, ups, downs, subreddit, college, create_utc):
+
          """
             Args:
               id (str):
@@ -51,17 +52,21 @@ class Post(db.Model):
               time_stamp (datetime):
               created (datetime):
               modified (datetime):
-
         """
-        self.id = id
-        self.title  = title
-        self.text = text
-        self.url = url
-        self.ups = ups
-        self.downs = downs
-        self.subreddit = subreddit
-        self.college = college
-        self.created = datetime.utcfromtimestamp(create_utc)
+         self.id = id
+         self.title  = title
+         self.text = text
+         self.url = url
+         self.ups = ups
+         self.downs = downs
+         self.subreddit = subreddit
+         self.college = college
+         self.created = datetime.utcfromtimestamp(create_utc)
+
+    @staticmethod
+    def list_colleges():
+        colleges = db.session.query(Post.college.distinct())
+        return sorted([str(name[0]) for name in colleges.all()])
 
     def __repr__(self):
         """ String representation of a post object """
