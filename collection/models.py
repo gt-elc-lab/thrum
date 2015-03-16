@@ -68,6 +68,7 @@ class Post(db.Model):
         colleges = db.session.query(Post.college.distinct())
         return sorted([str(name[0]) for name in colleges.all()])
 
+
     def __repr__(self):
         """ String representation of a post object """
         return '<Post %s>' % self.title

@@ -12,7 +12,7 @@ class TimeSerializer(object):
         self.posts = posts
 
     def hourly(self):
-        """ Computes the number of post for every hour"""
+        """ Sums the number of post for every hour"""
         counter = Counter()
         for post in self.posts:
             hour = post.created.hour
@@ -26,4 +26,15 @@ class TimeSerializer(object):
             # this gets you the day of the week as a string
             day = post.created.strftime('%A')
             counter[day] += 1
+        return dict(counter)
+
+    def average_hourly(self, days):
+        """ Computes the number of post per day every day"""
+        counter = Counter()
+        for post in self.posts:
+            hour = post.created.hour
+            counter[str(hour)] += 1
+        
+        for hour, posts in counter.iteritems():
+            counter[hour] = posts / days
         return dict(counter)
