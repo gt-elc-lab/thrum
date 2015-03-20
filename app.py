@@ -11,7 +11,7 @@ def index():
     return render_template('home.html', colleges=colleges)
 
 
-@app.route('/timeseries/<college>')
+@app.route('/dashboard/<college>')
 def timeseries_dashboard(college):
     query = db.session.query(Post)
     now = datetime.now()
