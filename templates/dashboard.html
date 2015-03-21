@@ -6,8 +6,11 @@
 			{% include 'sidebar.html' %}
 			
 			<div class="column-md-4">
-					<h3 class=" page-header text-center">{{college}}</h3>
-					{% include 'simple_line_graph.html' %}
+				<div class="row">
+					<h2 class="text-center">{{college}}</h2>
+					<p class="text-center">{{posts}} posts {{comments}} comments {{redditors}} unique redditors today</p>
+					{% include'visits_today.html' %}
+				</div>
 			</div>
 		</div>
 

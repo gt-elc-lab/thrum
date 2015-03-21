@@ -1,0 +1,35 @@
+<div id="visits_today" class="text-center">
+	
+</div>
+<script type="text/javascript">
+	var data = {{ hourly_data | safe}};
+	console.log(data);
+
+	// constants
+	var w = 600;
+	var h = 200;
+	var barPadding = 1;
+
+	// scaling
+	var max = d3.max(data, function(d) {return d.count});
+	var yScale = d3.scale.linear()
+			 		     .domain([0, max])
+			 		     .range([0, h]);
+
+	// create the svg
+	var svg = d3.select('#visits_today')
+				.append('svg')
+				.attr('width', w)
+				.attr('height', h);
+
+	svg.selectAll('rect')
+		.data(data)
+		.enter()
+		.append('rect')
+		.attr({
+			x: function(d, i) { return i * (w / data.length); },
+			y: function(d) { return  h - yScale(d.count); },
+			width: (w / data.length - barPadding),
+			height: function(d) {return  yScale(d.count); }
+		})
+</script>

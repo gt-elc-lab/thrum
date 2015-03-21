@@ -10,22 +10,23 @@ def index():
     colleges = Post.list_colleges()
     return render_template('home.html', colleges=colleges)
 
-
 @app.route('/dashboard/<college>')
-def timeseries_dashboard(college):
+def dashboard(college):
     query = db.session.query(Post)
-    now = datetime.now()
-    yesterday = now - timedelta(days=2)
-    two_weeks_ago = now - timedelta(weeks=2)
-    posts = query.filter(Post.created.between(yesterday, now),
+    time_serializer = TimeSerializer()
+    today = time_serializer.today()
+    yesterday = time_serializer.get_days_ago(30)
+    todays_posts = query.filter(Post.created.between(yesterday, today),
                          Post.college == college).all()
-    current_data = TimeSerializer(posts).average_hourly(1) 
-    posts = query.filter(Post.created.between(two_weeks_ago, yesterday)).all()
-    historical_data = TimeSerializer(posts).average_hourly(14)
+    hourly_data = time_serializer.hourly(todays_posts)
+    num_posts = len(todays_posts)
+    num_comments = num_posts
+    redditors = num_posts
     return render_template('dashboard.html', college=college,
-                                             colleges=Post.list_colleges(), 
-                                             past_day=current_data,
-                                             historical_data= historical_data)
+                                            posts=num_posts,
+                                            comments=num_comments,
+                                            redditors=num_posts,
+                                            hourly_data=hourly_data)
 
 @app.route('/tfidf')
 def do_tfidf():
