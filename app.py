@@ -1,6 +1,7 @@
 from flask import Flask, json, render_template, request, jsonify
 from datetime import datetime, timedelta
 from collection.models import Post, db
+from collection.nltk_20 import WordFrequency
 from analysis.tfidf import TFIDF
 from analysis.timeseries import TimeSerializer
 app = Flask(__name__, static_url_path='/static')
@@ -15,18 +16,24 @@ def dashboard(college):
     query = db.session.query(Post)
     time_serializer = TimeSerializer()
     today = time_serializer.today()
-    yesterday = time_serializer.get_days_ago(30)
+    yesterday = time_serializer.get_days_ago(1)
     todays_posts = query.filter(Post.created.between(yesterday, today),
                          Post.college == college).all()
     hourly_data = time_serializer.hourly(todays_posts)
-    num_posts = len(todays_posts)
-    num_comments = num_posts
-    redditors = num_posts
+    wf =  WordFrequency()
+    corpus = "".join([post.text for post in todays_posts])
+    corpus = wf.remove_punctuation(corpus)
+    word_cloud_data = wf.word_frequencies(corpus)
+
+    tfidf = TFIDF([post.text for post in todays_posts])
+    result = []
+    for post in todays_posts:
+        for r in tfidf.batch_tfidf(post.text):
+            result.append(r)
+
     return render_template('dashboard.html', college=college,
-                                            posts=num_posts,
-                                            comments=num_comments,
-                                            redditors=num_posts,
-                                            hourly_data=hourly_data)
+                                            word_cloud_data=jsonify(data=word_cloud_data),
+                                            tfidf_data=result)
 
 @app.route('/tfidf')
 def do_tfidf():

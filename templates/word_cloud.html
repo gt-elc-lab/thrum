@@ -1,0 +1,38 @@
+<div id="word-cloud" class="text-center">
+	<h2> Word Frequency</h2>
+</div>
+<script type="text/javascript">
+	var data = {{ word_cloud_data['data'] | safe }};
+	var wf = data.data
+	var width = 900;
+	var height = 600;
+
+	var fill = d3.scale.category20();
+	d3.layout.cloud().size([width, height])
+	  .words(wf)
+	  .padding(5)
+	  .rotate(function() { return ~~(Math.random() * 2) * 90; })
+	  .font("Impact")
+	  .fontSize(function(d) { return d.value * 10; })
+	  .on("end", draw)
+	  .start();
+
+	function draw(words) {
+	d3.select("#word-cloud").append("svg")
+	    .attr("width", width)
+	    .attr("height", height)
+	  .append("g")
+	    .attr("transform", "translate(" + 400 +",300)")
+	  .selectAll("text")
+	    .data(words)
+	  .enter().append("text")
+	    .style("font-size", function(d) { return (d.value * 12) + "px"; })
+	    .style("font-family", "Impact")
+	    .style("fill", function(d, i) { return fill(i); })
+	    .attr("text-anchor", "middle")
+	    .attr("transform", function(d) {
+	      return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+	    })
+	    .text(function(d) { return d.word; });
+	}
+</script>

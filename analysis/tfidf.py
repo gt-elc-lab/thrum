@@ -1,5 +1,7 @@
 import math
+import re
 from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 
 class TFIDF(object):
     """ Performs TFIDF against a given corpus"""
@@ -10,6 +12,8 @@ class TFIDF(object):
            corpus: the corpus to perform tfidf with
         """
         self.corpus = corpus
+        self.stopwords = stopwords.words('english')
+        self.stopwords.append('I')
 
     def tfidf(self, word, document):
         """ Calculates tfidf for a word in the given document
@@ -57,7 +61,10 @@ class TFIDF(object):
             document: a list of documents
 
         """
-        return [{word : self.tfidf(word, document) for word in word_tokenize(document)}]
+        regex = re.compile('[^a-zA-Z0-9 -]')
+        document = regex.sub("", document)
+        return [{'word': str(word), 'value' : self.tfidf(word, document)} 
+                for word in word_tokenize(document) if word not in self.stopwords]
 
     def _documents_containing(self, word):
         """Determines how many documents in the document contain a word
