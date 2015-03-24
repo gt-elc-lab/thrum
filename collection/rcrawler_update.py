@@ -2,7 +2,7 @@ import praw
 from models import db, Post, Comment
 from config import SUBREDDITS, USERNAME, PASSWORD
 from datetime import datetime
-
+import re
 
 def main():
     """
@@ -35,11 +35,12 @@ def crawl_subreddit(posts, school, subreddit):
     """
     num_posts = 0
     num_comments = 0
+    regex = re.compile('[^a-zA-Z0-9 -]')
     try: 
         for submission in posts:
             new_post = Post(id=submission.id, 
-                            title=submission.title.encode('utf-8'),
-                            text=submission.selftext.encode('utf-8'),
+                            title=regex.sub("", submission.title),
+                            text=regex.sub("", submission.selftext),
                             url=submission.url, 
                             ups=submission.ups, 
                             downs=submission.downs,
@@ -53,7 +54,7 @@ def crawl_subreddit(posts, school, subreddit):
             comments = praw.helpers.flatten_tree(submission.comments)
             for comment in comments:
                 new_comment = Comment(id=comment.id, 
-                                      body=comment.body.encode('utf-8'), 
+                                      body=regex.sub("", comment.body), 
                                       ups=comment.ups, 
                                       downs=comment.downs,
                                       post_id=submission.id,
@@ -62,8 +63,8 @@ def crawl_subreddit(posts, school, subreddit):
                 db.session.merge(new_comment)
                 db.session.commit()
                 num_comments += 1
-    except AssertionError as e:
-        pass
+    except Exception as e:
+        print e
        
     return (num_posts, num_comments)
             
