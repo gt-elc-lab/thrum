@@ -1,10 +1,13 @@
 from flask import Flask, json, render_template, request, jsonify
 from datetime import datetime, timedelta
-from collection.models import Post, db
+from collection.models import Post, Comment, db
 from collection.nltk_20 import WordFrequency
 from analysis.tfidf import TFIDF
 from analysis.timeseries import TimeSerializer
+import flask.ext.whooshalchemy as whoosh
 app = Flask(__name__, static_url_path='/static')
+whoosh.whoosh_index(app, Post)
+whoosh.whoosh_index(app, Comment)
 
 @app.route("/")
 def index():
@@ -32,6 +35,7 @@ def dashboard(college):
             result.append(r)
 
     return render_template('dashboard.html', college=college,
+                                            hourly_data=hourly_data,
                                             word_cloud_data=jsonify(data=word_cloud_data),
                                             tfidf_data=result)
 
