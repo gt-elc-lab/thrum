@@ -1,35 +1,49 @@
+import itertools
 from flask import Flask, json, render_template, request, jsonify
 from datetime import datetime, timedelta
 from collection.models import Post, db
 from analysis.tfidf import TFIDF
 from analysis.timeseries import TimeSerializer
 app = Flask(__name__, static_url_path='/static')
+query = db.session.query(Post)
 
-@app.route("/")
+@app.route('/')
 def index():
-    colleges = Post.list_colleges()
-    return render_template('home.html', colleges=colleges)
-
+    return render_template('home.html', colleges=Post.list_colleges())
 
 @app.route('/dashboard/<college>')
-def timeseries_dashboard(college):
-    query = db.session.query(Post)
-    now = datetime.now()
-    yesterday = now - timedelta(days=2)
-    two_weeks_ago = now - timedelta(weeks=2)
-    posts = query.filter(Post.created.between(yesterday, now),
-                         Post.college == college).all()
-    current_data = TimeSerializer(posts).average_hourly(1) 
-    posts = query.filter(Post.created.between(two_weeks_ago, yesterday)).all()
-    historical_data = TimeSerializer(posts).average_hourly(14)
-    return render_template('dashboard.html', college=college,
-                                             colleges=Post.list_colleges(), 
-                                             past_day=current_data,
-                                             historical_data= historical_data)
+def dashboard(college):
+    serializer = TimeSerializer()
+    today = serializer.today()
+    yesterday = serializer.get_days_ago(1)
+    posts = fetch_posts_by_date(college, today, yesterday)
+    hourly_data = compute_hourly_activity(posts)
+    return render_template('dashboard.html',
+                            college=college,
+                            colleges=Post.list_colleges(),
+                            activity=hourly_data)
 
 @app.route('/time')
-def hourly_data():
+def send_hourly_activity():
     college = request.args.get('college')
-    
+    serializer = TimeSerializer()
+    today = serializer.today()
+    yesterday = serializer.get_days_ago(1)
+    posts = fetch_posts_by_date(college, today , yesterday)
+    data = compute_hourly_activity(posts)
+    return jsonify(data=data)
+
+def compute_hourly_activity(posts):
+    serializer = TimeSerializer()
+    activity = []
+    for post in posts:
+        activity.append(post)
+        for comment in post.comments:
+            activity.append(comment)
+    return  serializer.hourly_activity(activity)
+
+def fetch_posts_by_date(college, start, stop): 
+    return query.filter(Post.created.between(stop, start),
+                         Post.college == college).all()
 if __name__ == "__main__":
     app.run(debug=True)

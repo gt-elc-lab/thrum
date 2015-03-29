@@ -1,15 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-		{% include 'head.html'%}
-		<body>
-		<div class="container-fluid">
-			{% include 'sidebar.html' %}
-			
-			<div class="column-md-4">
-					<h3 class=" page-header text-center">{{college}}</h3>
-					{% include 'simple_line_graph.html' %}
+{% extends "home.html" %}
+{% block head %}
+	{{super() }}
+{% endblock %}
+{% block body %}
+	{{super()}}
+	<div class="container">
+		<div class="col-md-8">
+			<div class="row">
+				<div class="btn-group btn-group-sm col-md-offset-4" role="group" aria-label="...">
+					<button type="button" class="btn btn-default">Past 24 Hours</button>
+					<button type="button" class="btn btn-default">Past Week</button>
+				</div>
+			</div>
+			{% include 'activity_graph.html' %}
+		</div>
+		<div class="col-md-4">
+			<div class="btn-group btn-group-sm col-md-offset-4" role="group" aria-label="...">
+				<button type="button" class="btn btn-default">Posts</button>
+				<button type="button" class="btn btn-default">Comments</button>
 			</div>
 		</div>
-
-		</body>
-</html>
+	</div>
+{% endblock %}

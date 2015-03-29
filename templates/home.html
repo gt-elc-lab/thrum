@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+	{% block head %}
 		{% include 'head.html'%}
+	{% endblock %}
 		<body>
-		<div class="container-fluid">
-			{% include 'sidebar.html' %}
-			
-			<div class="column-md-4">
-
-			</div>
-		</div>
-
+			{% block body %}
+				{% include 'navbar.html' %}
+			{% endblock %}
 		</body>
 </html>

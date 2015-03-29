@@ -1,0 +1,26 @@
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/">Thrum</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Colleges <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            {% for college in colleges %}
+              <li><a href="/dashboard/{{college}}">{{college}}</a></li>
+            {% endfor %}
+          </ul>  
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        {% if college %}
+         
+            <li class="text-secondary"><a href="#">{{college}}</a></li>
+        {% endif %}
+        <li><a href="#">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>

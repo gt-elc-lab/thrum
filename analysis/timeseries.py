@@ -1,40 +1,41 @@
-from datetime import datetime
+import itertools
+from datetime import datetime, timedelta
 from collections import Counter
 
 class TimeSerializer(object):
     """ Provides methods for computing time series data"""
 
-    def __init__(self, posts):
+    def __init__(self):
         """
         Args:
             posts (list): list of post sqlalchemy post objects
         """
-        self.posts = posts
-
-    def hourly(self):
-        """ Sums the number of post for every hour"""
-        counter = Counter()
-        for post in self.posts:
-            hour = post.created.hour
-            counter[str(hour)] += 1
-        return dict(counter)
-
-    def daily(self):
-        """ Computes the number of post for every day"""
-        counter = Counter()
-        for post in self.posts:
-            # this gets you the day of the week as a string
-            day = post.created.strftime('%A')
-            counter[day] += 1
-        return dict(counter)
-
-    def average_hourly(self, days):
-        """ Computes the number of post per day every day"""
-        counter = Counter()
-        for post in self.posts:
-            hour = post.created.hour
-            counter[str(hour)] += 1
         
-        for hour, posts in counter.iteritems():
-            counter[hour] = posts / days
-        return dict(counter)
+
+    def today(self):
+        return datetime.now()
+
+
+    def get_days_ago(self, days):
+        return datetime.now() - timedelta(days=days)
+
+    def get_weeks_ago(self, weeks):
+        return datetime.now()- timedelta(weeks=weeks)
+
+    def hourly_activity(self, data):
+        data = sorted(data, key=lambda x: x.created)
+        groupings =  itertools.groupby(data, key=lambda x: x.created.hour)
+        data =  [{'date': str(self.today() - timedelta(hours=hour)), 'count': len(list(group))}
+            for hour, group in groupings]
+        # active_hours = set()
+        # for record in data:
+        #     for date, count in record.iteritems():
+        #         print date
+        #         active_hours.add(datetime.strptime(date, '%a, %d'))
+        # for hour in range(0, 23):
+        #     if hour not in active_hours:
+        #         data.append({'date': str(self.today - timedelta(hours=hour)),
+        #                     'count': 0})
+        return data
+
+

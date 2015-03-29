@@ -1,0 +1,63 @@
+<div id="activity">
+	
+</div>
+
+<script type="text/javascript">
+	var margin = {top: 10, right: 10, bottom: 10, left: 10};
+	var width = 600 ;
+	var height = 250;
+	var data = {{ activity | safe}};
+	console.log(data)
+	var domainX = d3.extent(data, function(d) { return new Date(d.date)});
+	var domainY = d3.extent(data, function(d) { return d.count});
+
+	var x = d3.time.scale()
+				.domain(domainX)
+				.range([0, width]);
+
+	var y = d3.scale.linear()
+				.domain(domainY)
+				.range([height, 0 - margin.top]);
+
+	var xAxis = d3.svg.axis()
+				.scale(x)
+				.orient("bottom");
+
+	var yAxis = d3.svg.axis()
+				.scale(y)
+				.orient("left");
+
+	var line = d3.svg.line()
+				.x(function(d) {return x(new Date(d.date))})
+				.y(function(d) {return y(d.count)});
+
+	var svg = d3.select('#activity')
+                  .append('svg')
+                  .attr('width', width)
+                  .attr('height', height);
+
+	var path = svg.append('path')
+                      .datum(data)
+                      .attr('class', 'line')
+                      .attr('d', line)
+                      .style('fill', 'none')
+                      .style('stroke', '#FB5050')
+                      .style('stroke-width', '3px');  
+
+	svg.append('g')
+     	.attr({
+     		class: 'x axis',
+     		transform: 'translate(0,' + (height - margin.bottom) + ')',
+     	})
+     	.call(xAxis);
+
+ 	svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Posts");
+</script>
