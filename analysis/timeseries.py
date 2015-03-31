@@ -23,19 +23,18 @@ class TimeSerializer(object):
         return datetime.now()- timedelta(weeks=weeks)
 
     def hourly_activity(self, data):
+        result = []
         data = sorted(data, key=lambda x: x.created)
         groupings =  itertools.groupby(data, key=lambda x: x.created.hour)
-        data =  [{'date': str(self.today() - timedelta(hours=hour)), 'count': len(list(group))}
-            for hour, group in groupings]
-        # active_hours = set()
-        # for record in data:
-        #     for date, count in record.iteritems():
-        #         print date
-        #         active_hours.add(datetime.strptime(date, '%a, %d'))
-        # for hour in range(0, 23):
-        #     if hour not in active_hours:
-        #         data.append({'date': str(self.today - timedelta(hours=hour)),
-        #                     'count': 0})
+        for hour, group in groupings:
+            record = {'date': str(self.today() - timedelta(hours=hour)), 'count': len(list(group))}
+            result.append(record)
+        return result
+
+
+    def weekly_activity(self, data):
+        data = sorted(data, key=lambda x: x.created)
+        groupings =  itertools.groupby(data, key=lambda x: x.created.hour)
+        data =  [{'date': str(self.today() - timedelta(week=week)), 'count': len(list(group))}
+            for week, group in groupings]
         return data
-
-

@@ -23,8 +23,8 @@ def dashboard(college):
                             colleges=Post.list_colleges(),
                             activity=hourly_data)
 
-@app.route('/time')
-def send_hourly_activity():
+@app.route('/day')
+def send_daily_activity():
     college = request.args.get('college')
     serializer = TimeSerializer()
     today = serializer.today()
@@ -33,14 +33,33 @@ def send_hourly_activity():
     data = compute_hourly_activity(posts)
     return jsonify(data=data)
 
+@app.route('/week')
+def send_weekly_activity():
+    college = request.args.get('college')
+    serializer = TimeSerializer()
+    today = serializer.today()
+    week_ago = serializer.get_weeks_ago(1)
+    posts = fetch_posts_by_date(college, today, week_ago)
+    data = compute_weekly_activity(posts)
+    return jsonify(data=data)
+
 def compute_hourly_activity(posts):
     serializer = TimeSerializer()
+    activity = posts_and_comments(posts)
+    return  serializer.hourly_activity(activity)
+
+def compute_weekly_activity(posts):
+    serializer = TimeSerializer()
+    activity = posts_and_comments(posts)
+    return serializer.weekly_activity(activity)
+
+def posts_and_comments(posts):
     activity = []
     for post in posts:
         activity.append(post)
         for comment in post.comments:
             activity.append(comment)
-    return  serializer.hourly_activity(activity)
+    return activity
 
 def fetch_posts_by_date(college, start, stop): 
     return query.filter(Post.created.between(stop, start),
