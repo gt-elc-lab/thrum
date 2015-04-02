@@ -54,13 +54,14 @@ class TFIDF(object):
         num_appearances = self._documents_containing(word)
         return math.log(len(self.corpus) / 1 + num_appearances)
 
-    def batch_tfidf(self, document):
+    def batch_tfidf(self, document, scale=1):
         """ Calculates tfidf for every word in the document
 
         Args:
             document: a list of documents
 
         """
+
         regex = re.compile('[^a-zA-Z0-9 -]')
         document = regex.sub("", document)
         return [{'word': str(word), 'value' : self.tfidf(word, document)} 

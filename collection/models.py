@@ -1,6 +1,7 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from datetime import datetime 
+import flask.ext.whooshalchemy as whoosh
 
 DATABASE_URI = 'mysql://root:password@localhost/proto_thrum' 
 app = Flask(__name__)
@@ -24,6 +25,8 @@ class Post(db.Model):
       modified (datetime):
 
     """
+    __tablename__ = 'post'
+    __searchable__ = ['title','text']
     id = db.Column(db.String(10), primary_key=True)
     title = db.Column(db.String(10000), nullable=False)
     text = db.Column(db.String(10000), nullable=True)
@@ -35,6 +38,7 @@ class Post(db.Model):
     time_stamp = db.Column(db.DateTime, default=datetime.now())
     created = db.Column(db.DateTime, nullable=False)
     modified = db.Column(db.DateTime, default=datetime.now())
+    comments = db.relationship('Comment', backref='post', lazy='dynamic')
 
 
     def __init__(self, id, title, text, url, ups, downs, subreddit, college, create_utc):
@@ -89,17 +93,18 @@ class Comment(db.Model):
         modified (datetime):
         created (datetime):
     """
+    __tablename__ = 'comment'
+    __searchable__ = ['body']
     id = db.Column(db.String(10), primary_key=True)
     body = db.Column(db.String(10000), nullable=True)
     ups = db.Column(db.Integer, nullable=False)
     downs = db.Column(db.Integer, nullable=False)
     post_id = db.Column(db.String(10), db.ForeignKey('post.id'))
-    post = db.relationship(Post)
     time_stamp = db.Column(db.DateTime, default=datetime.now())
     modified = db.Column(db.DateTime, default=datetime.now())
     created = db.Column(db.DateTime, nullable=False)
     
-    def __init__(self, id, body, ups, downs, post_id, post, create_utc):
+    def __init__(self, id, body, ups, downs, post_id, create_utc):
         """
         Args:
             id (str):
@@ -113,12 +118,12 @@ class Comment(db.Model):
             modified (datetime):
             created (datetime):
         """
+        
         self.id = id
         self.body = body
         self.ups = ups
         self.downs = downs
         self.post_id = post_id
-        self.post = post
         self.created = datetime.utcfromtimestamp(create_utc)
 
     def __repr__(self):
