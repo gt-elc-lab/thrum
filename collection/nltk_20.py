@@ -5,7 +5,7 @@ import re
 # from rcrawler_declarative import Post, Comment, Base, engine
 from nltk.probability import FreqDist
 from nltk.corpus import stopwords
-
+from stop_words import get_stop_words
 # Base.metadata.bind = engine
 
 # DBSession = sessionmaker(bind=engine)
@@ -26,11 +26,13 @@ from nltk.corpus import stopwords
 class WordFrequency(object):
 
     def __init__(self):
-        self.stopwords = stopwords.words('english')
+        self.stopwords = get_stop_words('english') + stopwords.words('english')
+        self.stopwords = [word.lower() for word in self.stopwords]
 
     def word_frequencies(self, text_glob):
-        tokens = [word for word in nltk.word_tokenize(text_glob) 
+        tokens = [word.lower() for word in nltk.word_tokenize(text_glob) 
                     if word not in self.stopwords]
+        
         text = nltk.Text(tokens)
         fd = nltk.FreqDist(text)
         return [{'word': word, 'value':count} for word, count in fd.items()]
