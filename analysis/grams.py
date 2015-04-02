@@ -6,7 +6,7 @@ class BiGramGenerator(object):
     def __init__(self):
         return
 
-    def bigrams(corpus, frequency):
+    def bigrams(self, corpus, frequency):
         tokens = nltk.wordpunct_tokenize(corpus)
         finder = BigramCollocationFinder.from_words(tokens)
         finder.apply_freq_filter(frequency)

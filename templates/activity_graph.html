@@ -7,7 +7,6 @@
 	var width = 600 - margin.left - margin.right;
 	var height = 250 - margin.top - margin.bottom;
 	var data = {{ activity | safe}};
-	console.log(data)
 	var domainX = d3.extent(data, function(d) { return new Date(d.date)});
 	var domainY = d3.extent(data, function(d) { return d.count});
 
@@ -17,7 +16,7 @@
 
 	var y = d3.scale.linear()
 				.domain(domainY)
-				.range([height, 0]);
+				.range([height, margin.bottom]);
 
 	var xAxis = d3.svg.axis()
 				.scale(x)
@@ -63,6 +62,6 @@
      		transform: 'translate(0,' + height  + ')',
      	})
      	.call(xAxis)
-     	.ticks(12);
+     	// .ticks(12);
 
 </script>

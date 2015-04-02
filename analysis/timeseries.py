@@ -1,6 +1,7 @@
 import itertools
 from datetime import datetime, timedelta
 from collections import Counter
+from nltk.corpus import stopwords
 
 class TimeSerializer(object):
     """ Provides methods for computing time series data"""
@@ -10,6 +11,7 @@ class TimeSerializer(object):
         Args:
             posts (list): list of post sqlalchemy post objects
         """
+       
         
 
     def today(self):
