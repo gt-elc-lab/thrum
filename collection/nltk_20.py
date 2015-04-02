@@ -1,8 +1,3 @@
-import nltk
-import re
-# from sqlalchemy import create_engine
-# from sqlalchemy.orm import sessionmaker
-# from rcrawler_declarative import Post, Comment, Base, engine
 from nltk.probability import FreqDist
 from nltk.corpus import stopwords
 from stop_words import get_stop_words
@@ -37,6 +32,7 @@ class WordFrequency(object):
         fd = nltk.FreqDist(text)
         return [{'word': word, 'value':count} for word, count in fd.items()]
 
-    def remove_punctuation(self, text):
-        regex = re.compile('[^a-zA-Z0-9 -]')
+    @staticmethod
+    def remove_punctuation(text):
+        regex = re.compile('[^a-zA-Z0-9 ]')
         return regex.sub("", text)

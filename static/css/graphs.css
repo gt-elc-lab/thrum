@@ -1,0 +1,14 @@
+.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+  fill: red;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+
+svg {
+	background-color: #bf5a16";
+}

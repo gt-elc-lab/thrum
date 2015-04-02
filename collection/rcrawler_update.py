@@ -39,8 +39,8 @@ def crawl_subreddit(posts, school, subreddit):
     try: 
         for submission in posts:
             new_post = Post(id=submission.id, 
-                            title=regex.sub("", submission.title),
-                            text=regex.sub("", submission.selftext),
+                            title=submission.title,
+                            text=submission.selftext,
                             url=submission.url, 
                             ups=submission.ups, 
                             downs=submission.downs,
@@ -54,17 +54,16 @@ def crawl_subreddit(posts, school, subreddit):
             comments = praw.helpers.flatten_tree(submission.comments)
             for comment in comments:
                 new_comment = Comment(id=comment.id, 
-                                      body=regex.sub("", comment.body), 
+                                      body=comment.body, 
                                       ups=comment.ups, 
                                       downs=comment.downs,
                                       post_id=submission.id,
-                                      post=new_post,
                                       create_utc=submission.created_utc)
                 db.session.merge(new_comment)
                 db.session.commit()
                 num_comments += 1
-    except Exception as e:
-        print e
+    except Exception as error:
+        print str(error)
        
     return (num_posts, num_comments)
             

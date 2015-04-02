@@ -1,5 +1,7 @@
+import itertools
 from datetime import datetime, timedelta
 from collections import Counter
+from nltk.corpus import stopwords
 
 class TimeSerializer(object):
     """ Provides methods for computing time series data"""
@@ -9,48 +11,30 @@ class TimeSerializer(object):
         Args:
             posts (list): list of post sqlalchemy post objects
         """
-        
 
-    def hourly(self, posts):
-        """ Sums the number of post for every hour"""
-        counter = Counter()
-        for hour in range(0, 24):
-            counter[str(hour)] = 0
-
-        for post in posts:
-            hour = post.created.hour
-            counter[str(hour)] += 1
-
-        return [{'hour': hour, 'count':count} for hour, count in counter.iteritems()] 
-
-    def daily(self, posts):
-        """ Computes the number of post for every day"""
-        counter = Counter()
-        for post in posts:
-            # this gets you the day of the week as a string
-            day = post.created.strftime('%A')
-            counter[day] += 1
-        return dict(counter)
-
-    def average_hourly(self, days):
-        """ Computes the number of post per day every day"""
-        counter = Counter()
-        for post in self.posts:
-            hour = post.created.hour
-            counter[str(hour)] += 1
-        
-        for hour, posts in counter.iteritems():
-            counter[hour] = posts / days
-        return dict(counter)
-
-    @staticmethod
-    def today():
+    def today(self):
         return datetime.now()
 
-    @staticmethod
-    def get_days_ago(days):
+
+    def get_days_ago(self, days):
         return datetime.now() - timedelta(days=days)
 
-    @staticmethod
-    def get_weeks_ago(weeks):
+    def get_weeks_ago(self, weeks):
         return datetime.now()- timedelta(weeks=weeks)
+
+    def hourly_activity(self, data):
+        result = []
+        data = sorted(data, key=lambda x: x.created)
+        groupings =  itertools.groupby(data, key=lambda x: x.created.hour)
+        for hour, group in groupings:
+            record = {'date': str(self.today() - timedelta(hours=hour)), 'count': len(list(group))}
+            result.append(record)
+        return result
+
+
+    def weekly_activity(self, data):
+        data = sorted(data, key=lambda x: x.created)
+        groupings =  itertools.groupby(data, key=lambda x: x.created.hour)
+        data =  [{'date': str(self.today() - timedelta(week=week)), 'count': len(list(group))}
+            for week, group in groupings]
+        return data
