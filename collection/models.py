@@ -128,5 +128,7 @@ class Comment(db.Model):
 
     def __repr__(self):
         """ String representation of a comment object"""
-        return '<Comment %s>' % self.body 
+        return '<Comment %s>' % self.body[:10] 
 
+whoosh.whoosh_index(app, Post)
+whoosh.whoosh_index(app, Comment)

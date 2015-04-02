@@ -1,4 +1,3 @@
-import itertools
 from flask import Flask, json, render_template, request, jsonify
 from datetime import datetime, timedelta
 from collection.models import Post, Comment, db
