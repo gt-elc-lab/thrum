@@ -1,14 +1,22 @@
-.node {
-  stroke: #fff;
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+	font-family: Lato;
+	font-size: 13px;
+  fill: none;
+  stroke: #777;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
   stroke-width: 1.5px;
-  fill: red;
-}
-
-.link {
-  stroke: #999;
-  stroke-opacity: .6;
-}
-
-svg {
-	background-color: #bf5a16";
 }

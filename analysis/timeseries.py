@@ -11,6 +11,7 @@ class TimeSerializer(object):
         Args:
             posts (list): list of post sqlalchemy post objects
         """
+        self.now = datetime.now()
 
     def today(self):
         return datetime.now()
@@ -32,9 +33,18 @@ class TimeSerializer(object):
         return result
 
 
-    def weekly_activity(self, data):
+    def weekly_buckets(self, data, school, vanilla=False):
         data = sorted(data, key=lambda x: x.created)
-        groupings =  itertools.groupby(data, key=lambda x: x.created.hour)
-        data =  [{'date': str(self.today() - timedelta(week=week)), 'count': len(list(group))}
-            for week, group in groupings]
-        return data
+        buckets = itertools.groupby(data, key=lambda x: int(x.created.strftime('%U')))
+        if vanilla:
+            return buckets 
+        output = []
+        for bucket, items in buckets:
+            # datetime objects don't have a week field so we have to find the
+            # week of the post with respect to the current time. 
+            # strftime('%U') gives you the current week in the year as a string
+            offset = int(self.now.strftime('%U')) - bucket
+            date = self.now - timedelta(weeks=offset)
+            count = len(list(items))
+            output.append({'date': str(date), 'count': count, 'college': school})
+        return output
