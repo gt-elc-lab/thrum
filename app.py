@@ -16,18 +16,24 @@ def index():
     return render_template('home.html', colleges=colleges)
 
 
-@app.route('/data/<tech>/<uga>/<word>')
-def send_data(tech, uga, word):
-    tech_posts = query_word_and_school(tech, word)
-    uga_posts = query_word_and_school(uga, word)
-    tech_results = bucketize(tech_posts, tech)
-    uga_results = bucketize(uga_posts, uga)
-    return jsonify(tech=tech_results,uga=uga_results)
+@app.route('/data/')
+def send_data():
+    dropdown = Post.list_colleges()
+    colleges = request.args.getlist('colleges')
+    term = request.args.get('term')
+    result = []
+    for school in colleges:
+        corpus = query_word(school, term)
+        buckets = bucketize(corpus, school)
+        if buckets:
+            result += buckets
+    return render_template('line_graph.html', colleges=dropdown,
+                                              results=jsonify(data=result))
 
 
-def query_word_and_school(school, word):
-    post_results = Post.query.whoosh_search(word).filter(Post.college==school)
-    comments_results = Comment.query.whoosh_search(word).filter(Post.college==school)
+def query_word(college, word):
+    post_results = Post.query.whoosh_search(word).filter(Post.college==college)
+    comments_results = Comment.query.whoosh_search(word).filter(Comment.college==college)
     corpus = post_results.all() + comments_results.all()
     return corpus
 

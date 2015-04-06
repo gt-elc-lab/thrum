@@ -102,9 +102,10 @@ class Comment(db.Model):
     post_id = db.Column(db.String(10), db.ForeignKey('post.id'))
     time_stamp = db.Column(db.DateTime, default=datetime.now())
     modified = db.Column(db.DateTime, default=datetime.now())
+    college = db.Column(db.String(1000), nullable=False)
     created = db.Column(db.DateTime, nullable=False)
     
-    def __init__(self, id, body, ups, downs, post_id, create_utc):
+    def __init__(self, id, body, ups, downs, post_id, create_utc, college):
         """
         Args:
             id (str):
@@ -125,6 +126,7 @@ class Comment(db.Model):
         self.downs = downs
         self.post_id = post_id
         self.created = datetime.utcfromtimestamp(create_utc)
+        self.college = college
 
     def __repr__(self):
         """ String representation of a comment object"""

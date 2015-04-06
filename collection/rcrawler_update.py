@@ -16,7 +16,7 @@ def main():
         print "Scraping {} : r/{}".format(school, subreddit)
         start = datetime.now()
         posts = reddit.get_subreddit(subreddit)
-        num_posts, num_comments = crawl_subreddit(posts.get_new(limit=30), school, subreddit)
+        num_posts, num_comments = crawl_subreddit(posts.get_new(limit=300), school, subreddit)
         duration = datetime.now() - start
         output = "Finished scraping {} : r/{} | {} posts {} comments | {} seconds"
         print output.format(school, subreddit, num_posts, num_comments, 
@@ -58,7 +58,8 @@ def crawl_subreddit(posts, school, subreddit):
                                       ups=comment.ups, 
                                       downs=comment.downs,
                                       post_id=submission.id,
-                                      create_utc=submission.created_utc)
+                                      create_utc=submission.created_utc,
+                                      college=school)
                 db.session.merge(new_comment)
                 db.session.commit()
                 num_comments += 1

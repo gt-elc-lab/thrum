@@ -46,5 +46,5 @@ class TimeSerializer(object):
             offset = int(self.now.strftime('%U')) - bucket
             date = self.now - timedelta(weeks=offset)
             count = len(list(items))
-            output.append({'date': str(date), 'count': count, 'college': school})
+            output.append({'date': str(date), 'count': count, 'college':school, })
         return output

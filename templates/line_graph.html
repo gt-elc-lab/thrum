@@ -1,3 +1,93 @@
+{% extends 'home.html' %}
+{% block head %}
+	{{ super() }}
+{% endblock %}
+{% block content %}
+{{super()}}
+<div class="container">
+	
+
 <div id="line-graph">
 	
 </div>
+
+<script type="text/javascript">
+	var results = {{results['data'] |safe}};
+	var data = results.data;
+	var margin = {top: 20, right: 20, bottom: 30, left: 50};
+    var width = 1080 - margin.left - margin.right;
+    var height = 550 - margin.top - margin.bottom;
+
+    function DateDomain(d) {return new Date(d.date);}
+    function YCountDomain(d) { return d.count;}
+
+    var x = d3.time.scale().range([0, width])
+    		.domain([d3.min(data, DateDomain), d3.max(data, DateDomain)]);
+    var y = d3.scale.linear().range([height, 0])
+    		.domain([d3.min(data, YCountDomain), d3.max(data, YCountDomain)]);
+
+    var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .ticks(d3.time.week, 1);
+
+	var yAxis = d3.svg.axis()
+	    .scale(y)
+	    .orient("left");
+
+	var line = d3.svg.line()
+    .x(function(d) { return x(new Date(d.date)); })
+    .y(function(d) { return y(d.count); })
+    .interpolate('cardinal');
+
+    var svg = d3.select("#line-graph").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  	.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+   
+    var dataGroup = d3.nest().key(function(d) {return d.college;}).entries(data);
+	x.domain(d3.extent(data, function(d) { return new Date(d.date); }));
+    y.domain(d3.extent(data, function(d) { return d.count; }));
+
+     svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Occurences");
+
+   var color = d3.scale.linear()
+    .domain([0, dataGroup.length - 1])
+    .range(["red", "white","blue", "green"]);
+
+   dataGroup.forEach(function(d,i) {
+	   svg.append("path")
+	      .datum(d.values)
+	      .attr("class", "line")
+	      .attr('fill', 'none')
+	      .style('stroke', color(i))
+      	  .style('stroke-width', '3px')
+	      .attr("d", line);
+
+	      var points = svg.selectAll(".point")
+        .data(d.values)
+      .enter().append("svg:circle")
+         .attr("stroke", "black")
+         .attr("fill", color(i))
+         .attr("cx", function(d, i) { return x(new Date(d.date)) })
+         .attr("cy", function(d, i) { return y(d.count) })
+         .attr("r", function(d, i) { return 10 });
+   });
+</script>
+</div>
+{% endblock %}
