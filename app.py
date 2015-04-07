@@ -8,6 +8,8 @@ from analysis.grams import BiGramGenerator
 from analysis.d3_formatters import ForceLayout
 from analysis.timeseries import TimeSerializer
 from collection.nltk_20 import WordFrequency
+from analysis.ner import NER
+from nltk.probability import FreqDist
 app = Flask(__name__, static_url_path='/static')
 query = db.session.query(Post)
 
@@ -191,6 +193,13 @@ def bigram_graph(college, word):
     corpus = fuse(posts_and_comments(posts), word)
     nodes, edges = bigram_graph(corpus)
     return jsonify(nodes=nodes, edges=edges)
+    
+@app.route('/ner')
+def send_ner():
+    college = request.args.get('college')
+    posts = fetch_todays_post(college)
+    ner = compute_ner(posts)
+    return jsonify(data=ner)
 
 def compute_hourly_activity(posts):
     serializer = TimeSerializer()
@@ -231,7 +240,20 @@ def compute_word_frequency(posts):
             corpus += cleaned
     frequencies = wf.word_frequencies(corpus)
     return sorted(frequencies,key=lambda x: x['value'], reverse=True)
-
+    
+def compute_ner(posts):
+    ner = NER(posts)
+    corpus = ""
+    for item in posts:
+        if isinstance(item, Post):
+            corpus += item.text
+        else:
+            corpus += item.body
+    tagged_words = ner.named_entities(corpus)
+    # fd = FreqDist([(word) for (word, tag) in tagged_words])
+    # return sorted([{'word': word, 'value':count} for word, count in fd.items()], key=lambda x: x['value'],reverse=True)
+    return tagged_words
+    
 def fuse(posts, word=None):
     corpus = ""
     for item in posts:
