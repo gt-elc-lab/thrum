@@ -33,7 +33,7 @@ class TimeSerializer(object):
         return result
 
 
-    def weekly_buckets(self, data, school, vanilla=False):
+    def weekly_buckets(self, data, school, term,  vanilla=False):
         data = sorted(data, key=lambda x: x.created)
         buckets = itertools.groupby(data, key=lambda x: int(x.created.strftime('%U')))
         if vanilla:
@@ -46,5 +46,5 @@ class TimeSerializer(object):
             offset = int(self.now.strftime('%U')) - bucket
             date = self.now - timedelta(weeks=offset)
             count = len(list(items))
-            output.append({'date': str(date), 'count': count, 'college':school, })
+            output.append({'date': str(date), 'count': count, 'college':school, 'word': term })
         return output

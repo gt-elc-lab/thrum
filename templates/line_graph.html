@@ -5,24 +5,29 @@
 {% block content %}
 {{super()}}
 <div class="container">
-	
-
-<div id="line-graph">
-	
-</div>
+  <div class="row">
+      <div id="line-graph"></div>
+      <div id="wordtree"></div>
+      <div id="tooltip" class="hidden">
+        <p><span id="college">100</span></p>
+        <p><span id="date">100</span></p>
+        <p><span id="count">100</span></p>
+      </div>
+    
+  </div>
 
 <script type="text/javascript">
 	var results = {{results['data'] |safe}};
 	var data = results.data;
-	var margin = {top: 20, right: 20, bottom: 30, left: 50};
-    var width = 1080 - margin.left - margin.right;
-    var height = 550 - margin.top - margin.bottom;
+	var margin = {top: 20, right: 20, bottom: 50, left: 50};
+  var width = 1080 - margin.left - margin.right;
+  var height = 300 - margin.top - margin.bottom;
 
     function DateDomain(d) {return new Date(d.date);}
     function YCountDomain(d) { return d.count;}
 
     var x = d3.time.scale().range([0, width])
-    		.domain([d3.min(data, DateDomain), d3.max(data, DateDomain)]);
+    		.domain([0, d3.max(data, DateDomain)]);
     var y = d3.scale.linear().range([height, 0])
     		.domain([d3.min(data, YCountDomain), d3.max(data, YCountDomain)]);
 
@@ -64,11 +69,11 @@
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Occurences");
+      .text("Appearances / week");
 
    var color = d3.scale.linear()
     .domain([0, dataGroup.length - 1])
-    .range(["red", "white","blue", "green"]);
+    .range(["blue","orange", "red", "green", "yellow", "white", "magenta"]);
 
    dataGroup.forEach(function(d,i) {
 	   svg.append("path")
@@ -81,12 +86,85 @@
 
 	      var points = svg.selectAll(".point")
         .data(d.values)
-      .enter().append("svg:circle")
+        .enter().append("svg:circle")
          .attr("stroke", "black")
          .attr("fill", color(i))
          .attr("cx", function(d, i) { return x(new Date(d.date)) })
          .attr("cy", function(d, i) { return y(d.count) })
-         .attr("r", function(d, i) { return 10 });
+         .attr("r", 5)
+         .on('mouseover', function(d) {
+                d3.select(this)
+                    // .attr('stroke', 'blue');
+                
+                var mouse = {
+                    x : d3.mouse(this)[0],
+                    y : d3.mouse(this)[1]
+                };
+                console.log(mouse.x + ' ' + mouse.y);
+                // Make the tooltip visible
+                 var tooltip = d3.select('#tooltip')
+                    .style('position', 'absolute')
+                    .style('left', mouse.x + 'px')
+                    .style('top', mouse.y +'px');
+
+                // Add the message and meta data
+                tooltip.select('#college').text(d.college);
+                tooltip.select('#date').text(new Date(d.date).toLocaleDateString());
+                tooltip.select('#count').text(d.count);
+
+                d3.select('#tooltip').classed('hidden', false)
+              })
+               .on('mouseout', function(d) {
+               
+                 d3.select('#tooltip').classed('hidden', true);
+                 d3.select('#tooltip').classed('btn-primary', true);
+
+            })
+            .on('click', function(d) {
+                drawWordTree(d.college, d.word, new Date(d.date).getTime());
+            });
+
+
+
+         var legendSpace = width/dataGroup.length;
+
+          svg.append("text")
+            .attr("x", (legendSpace / 2) + i * legendSpace - margin.left*2)
+            .attr("y", height + margin.bottom - 10) 
+            .attr('font-size', '18px')
+            .attr('font-weight', 'bold')
+            .attr("class", "legend")
+            .style("fill", color(i)) 
+            .text(d.key);  
+
+            function drawWordTree(college, word, timestamp) {
+    var url = '/' + college + '/' + word + '/' + timestamp;
+        d3.json(url, function(error, data) {
+            if (error) {
+                alert('Error occured in drawWordTree');
+                return;
+            }
+
+            var processed = [];
+            data.data.forEach(function(d) {
+                processed.push([d]);
+            });
+
+            console.log(processed);
+            google_data = google.visualization.arrayToDataTable(processed);
+            var options = {
+              wordtree: {
+                format: 'implicit',
+                word: word
+                }
+            };
+
+          var chart = new google.visualization.WordTree(document.getElementById('wordtree'));
+            chart.draw(google_data, options);
+        });
+
+
+}   
    });
 </script>
 </div>

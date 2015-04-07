@@ -16,7 +16,7 @@ def main():
         print "Scraping {} : r/{}".format(school, subreddit)
         start = datetime.now()
         posts = reddit.get_subreddit(subreddit)
-        num_posts, num_comments = crawl_subreddit(posts.get_new(limit=300), school, subreddit)
+        num_posts, num_comments = crawl_subreddit(posts.get_new(limit=30), school, subreddit)
         duration = datetime.now() - start
         output = "Finished scraping {} : r/{} | {} posts {} comments | {} seconds"
         print output.format(school, subreddit, num_posts, num_comments, 
