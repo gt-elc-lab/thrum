@@ -77,6 +77,12 @@ class Post(db.Model):
         """ String representation of a post object """
         return '<Post %s>' % self.title
 
+    def __hash__(self):
+      return hash(self.id + str(self.created))
+
+    def __eq__(self, other):
+      return self.id == other.id
+
 
 class Comment(db.Model):
     """sqlalchemy Comment object.
@@ -130,7 +136,13 @@ class Comment(db.Model):
 
     def __repr__(self):
         """ String representation of a comment object"""
-        return '<Comment %s>' % self.body[:10] 
+        return '<Comment %s>' % self.body[:10]
+
+    def __hash__(self):
+      return hash(self.id + str(self.created))
+
+    def __eq__(self, other):
+      return self.id == other.id
 
 whoosh.whoosh_index(app, Post)
 whoosh.whoosh_index(app, Comment)
