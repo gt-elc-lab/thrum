@@ -40,7 +40,6 @@ class Post(db.Model):
     modified = db.Column(db.DateTime, default=datetime.now())
     comments = db.relationship('Comment', backref='post', lazy='dynamic')
 
-
     def __init__(self, id, title, text, url, ups, downs, subreddit, college, create_utc):
 
          """
@@ -72,6 +71,9 @@ class Post(db.Model):
         colleges = db.session.query(Post.college.distinct())
         return sorted([str(name[0]) for name in colleges.all()])
 
+
+    def get_text(self):
+      return self.text
 
     def __repr__(self):
         """ String representation of a post object """
@@ -134,6 +136,9 @@ class Comment(db.Model):
         self.created = datetime.utcfromtimestamp(create_utc)
         self.college = college
 
+    def get_text(self):
+      return self.body 
+      
     def __repr__(self):
         """ String representation of a comment object"""
         return '<Comment %s>' % self.body[:10]

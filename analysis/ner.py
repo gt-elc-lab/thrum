@@ -1,3 +1,4 @@
+import string
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk import probability
@@ -15,7 +16,9 @@ class NER(object):
         return pos_tag(sentence)
 
     def tokenize_sentences(self, corpus):
-        sentences = sent_tokenize(corpus)
+        corpus = corpus.lower()
+        removed_punctuation = "".join([ch for ch in corpus if ch not in string.punctuation])
+        sentences = sent_tokenize(removed_punctuation)
         return sentences
     
     def tokenize_words(self, sentence):

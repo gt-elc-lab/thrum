@@ -2,3 +2,4 @@ README.html
 /whoosh_index
 *.pyc
 .idea
+collection/whoosh_index
