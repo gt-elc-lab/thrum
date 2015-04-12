@@ -47,6 +47,6 @@ class TFIDF(object):
             response = tfidf.transform([item.get_text()])
             for col in response.nonzero()[1]:
                 words.append((feature_names[col], response[0, col]))
-        words = sorted(words, key=lambda x: x[1])
+        words = sorted(words, key=lambda x: x[1], reverse=True)
         return words
 

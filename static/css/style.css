@@ -1,3 +1,15 @@
 .inline-block {
 	display: inline-block;
 }
+
+.left-buffer {
+	margin-left: 1px;
+}
+
+.right-buffer {
+	margin-right: 1px;
+}
+
+.full-buffer {
+	margin: 1px 1px 1px 1px;
+}
