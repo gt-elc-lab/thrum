@@ -13,10 +13,11 @@
 					<li ng-repeat="word in trending track by $index" class="list-group-item">{{ word | angular}}</li>
 				</ul> -->
 				<h1 class="text-center">{{selected | angular}}</h1>
-				<h5 class="text-center"> trending</h5>
+				<h5 ng-if="term" class="text-center"> trending</h5>
 				<a ng-repeat="word in trending track by $index"  ng-click="usage(word)"href="#" class="btn btn-primary btn-sm full-buffer">{{ word | angular}}</a>
 			</div>
 			<div class="row">
+				<h1 ng-if="term">{{term | angular}}</h1>
 				<bar-graph data="usageData">	
 				</bar-graph>
 			</div>

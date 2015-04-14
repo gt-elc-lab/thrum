@@ -1,4 +1,5 @@
 import unittest
+import nltk
 from datetime import datetime
 from datetime import timedelta
 from analysis.tfidf import TFIDF
@@ -39,8 +40,7 @@ class NERTests(unittest.TestCase):
         for v, r in result:
             if r in ['NN','JJ', 'NNS', 'JJR','RB','RBR']:
                 print v , r
-
-
+   
 class TopicDetectionTests(unittest.TestCase):
 
     def setUp(self):
@@ -55,16 +55,30 @@ class TopicDetectionTests(unittest.TestCase):
         intersection = tf.intersection(ner)
         for word in intersection:
             print word
+        recovered = recover_bigrams(tf, ner)
+        for word in recovered:
+            print word
 
 parts_of_speech = set(['NN','JJ', 'NNS', 'JJR','RB','RBR'])
+
 def fetch_data(college='Georgia Tech', limit=20):
     today = datetime.now()
-    two_days_ago = today - timedelta(hours=24)
+    two_days_ago = today - timedelta(hours=48)
     posts = Post.query.filter(Post.college == college, Post.created.between(two_days_ago, today)).all()
     comments = []
     for post in posts: 
         for comment in post.comments:
             comments.append(comment)
     return posts + comments
+
+
+def recover_bigrams(tfidf, named_entities):
+    bigrams = set()
+    for bigram in tfidf:
+        first_word = bigram.split(" ")[0]
+        if first_word in  named_entities:
+            bigrams.add(bigram)
+    return bigrams
+
 if __name__ == '__main__':
     unittest.main()

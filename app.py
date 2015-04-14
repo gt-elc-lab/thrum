@@ -34,7 +34,9 @@ def trending():
 def fetch_data(college, hours=24):
     today = datetime.now()
     two_days_ago = today - timedelta(hours=hours)
-    posts = Post.query.filter(Post.college == college, Post.created.between(two_days_ago, today)).all()
+    posts = Post.query.filter(
+        Post.college == college,
+        Post.created.between(two_days_ago, today)).all()
     comments = []
     for post in posts: 
         for comment in post.comments:
@@ -44,11 +46,11 @@ def fetch_data(college, hours=24):
 def detect_topics(corpus):
     parts_of_speech = set(['NN','JJ', 'NNS', 'JJR','RB','RBR'])
     tfidf = TFIDF(corpus).get()
-    fused = ''.join([item.get_text() for item in corpus])
-    ner = NER(corpus).named_entities(fused)
-    relevant = set([word[0] for word in tfidf if word[1] > 0.3])
-    entities = set([word[0] for word in ner if word[1] in parts_of_speech])
-    intersection = relevant.intersection(entities)
+    # fused = ''.join([item.get_text() for item in corpus])
+    # ner = NER(corpus).named_entities(fused)
+    relevant = set([word[0] for word in tfidf if word[1] > 0.4])
+    # entities = set([word[0] for word in ner if word[1] in parts_of_speech])
+    # intersection = relevant.intersection(entities)
     # bigrams = recover_bigrams(relevant, entities)
     return list(relevant)
 
@@ -69,8 +71,14 @@ def send_posts():
 
 
 def text_search(college, term):
-    posts = Post.query.whoosh_search(term).filter(Post.college==college).all()
-    comments = Post.query.whoosh_search(term).filter(Comment.college==college).all()
+    present = datetime.now()
+    past = datetime.now() - timedelta(weeks=4)
+    posts = Post.query.whoosh_search(term).filter(
+        Post.college==college,
+        Post.created.between(past, present)).all()
+    comments = Comment.query.whoosh_search(term).filter(
+        Comment.college==college,
+        Comment.created.between(past, present)).all()
     return posts + comments
 
 
@@ -137,15 +145,6 @@ def cluster(posts):
 
 if __name__ == "__main__":
     app.run(debug=True)
-    # posts = Post.query.filter(Post.college=='Georgia Tech').all()[:300]
-    # corpus = [post.text for post in posts]
-    # text = "".join([p for p in corpus])
-    # tf = TFIDF(corpus)
-    # a=[]
-    # for c in corpus:
-    #     a+= tf.batch_tfidf(c)
-    # a = sorted(a, key=lambda x:x['value'])
-    # for word in a:
-    #     print word
+   
 
 
