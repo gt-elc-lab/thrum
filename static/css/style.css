@@ -13,3 +13,7 @@
 .full-buffer {
 	margin: 1px 1px 1px 1px;
 }
+
+.top-buffer {
+	margin-top: 10px;
+}
