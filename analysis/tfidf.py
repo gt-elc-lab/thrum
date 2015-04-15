@@ -2,7 +2,7 @@ import math
 import re
 import nltk
 import string
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -49,4 +49,26 @@ class TFIDF(object):
                 words.append((feature_names[col], response[0, col]))
         words = sorted(words, key=lambda x: x[1], reverse=True)
         return words
+
+    def post_get(self):
+        tfidf = self.post_compute()
+        feature_names = tfidf.get_feature_names()
+        words = []
+        for sentence in sent_tokenize(self.corpus):
+            response = tfidf.transform([sentence])
+            for col in response.nonzero()[1]:
+                words.append((feature_names[col], response[0, col]))
+        words = sorted(words, key=lambda x: x[1], reverse=True)
+        return words
+
+    def post_compute(self, ngram_range=(1,2)):
+        token_dict = {}
+        for sentence in sent_tokenize(self.corpus):
+            text = sentence.lower()
+            no_punctuation = "".join([ch for ch in text if ch not in self.punctuation])
+            token_dict[sentence] = no_punctuation
+        tfidf = TfidfVectorizer(tokenizer=self.tokenize, stop_words='english', ngram_range=ngram_range)
+        tfidf.fit_transform(token_dict.values())
+        self.tfidf = tfidf
+        return self.tfidf
 

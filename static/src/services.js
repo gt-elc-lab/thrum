@@ -1,7 +1,7 @@
 var app = angular.module('thrum');
-app.service('Api', ['$http', Api]);
-function Api($http) {
+app.service('Flask', ['$http', Flask]);
 
+function Flask($http) {
     var exports = {};
 
     exports.getColleges = function() {
@@ -42,6 +42,17 @@ function Api($http) {
                 term: term
             }
       });
+    };
+
+    exports.getWordTreeData = function(college, term) {
+        return $http({
+            url: '/wordtree',
+            method: 'GET',
+            params: {
+                college: college,
+                term: term
+            }
+        });
     };
 
     return exports;

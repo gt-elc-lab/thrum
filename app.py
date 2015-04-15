@@ -1,3 +1,4 @@
+import string
 from flask import Flask, json, render_template, request, jsonify
 from flask.ext.triangle import Triangle
 from nltk.tokenize import sent_tokenize
@@ -10,13 +11,13 @@ from analysis.d3_formatters import ForceLayout
 from analysis.timeseries import TimeSerializer
 from analysis.ner import NER
 from collection.nltk_20 import WordFrequency
-app = Flask(__name__, static_url_path='/static')
+app = Flask(__name__, static_url_path='')
 Triangle(app)
 query = db.session.query(Post)
 
 @app.route('/')
-def index():
-    return render_template('home.html')
+def root():
+    return render_template('index.html')
 
 @app.route('/colleges')
 def colleges():
@@ -30,7 +31,65 @@ def trending():
     topics = detect_topics(data)
     return jsonify(data=topics)
 
-    
+@app.route('/posts')
+def send_posts():
+    college = request.args.get('college')
+    term = request.args.get('term')
+    posts = [item.get_text() for item in text_search(college, term)]
+    return jsonify(data=posts)
+
+@app.route('/usage')
+def usage():
+    college = request.args.get('college')
+    term = request.args.get('term')
+    posts = text_search(college, term)
+    data  = cluster(posts)
+    return jsonify(data=data)
+
+@app.route('/content')
+def content():
+    college = request.args.get('college')
+    term = request.args.get('term')
+    posts = text_search(college, term)
+    posts = [post.get_text() for post in posts]
+    return jsonify(data=posts)
+
+@app.route('/wordtree')
+def wordtree():
+    college = request.args.get('college')
+    term = request.args.get('term')
+    corpus = text_search(college, term)
+    text = [item.get_text() for item in corpus]
+    relevant = extract_relevant_sentences(term, text)
+    return jsonify(data=relevant)
+
+def extract_relevant_sentences(term, text):
+    relevant = []
+    for document in text:
+        sentences = sent_tokenize(document)
+        contains_word = [sentence for sentence in sentences if term in sentence]
+        if contains_word:
+            for s in contains_word:
+                relevant.append([remove_punctionation(s)])
+    return relevant
+
+def remove_punctionation(text):
+    return ''.join([ch for ch in text if ch not in string.punctuation])
+
+def text_search(college, term):
+    present = datetime.now()
+    past = datetime.now() - timedelta(weeks=4)
+    posts = Post.query.whoosh_search(term).filter(
+        Post.college==college,
+        Post.created.between(past, present)).all()
+    comments = Comment.query.whoosh_search(term).filter(
+        Comment.college==college,
+        Comment.created.between(past, present)).all()
+    return posts + comments
+
+def cluster(posts):
+    return TimeSerializer().daily_buckets(posts)  
+
 def fetch_data(college, hours=24):
     today = datetime.now()
     two_days_ago = today - timedelta(hours=hours)
@@ -44,104 +103,9 @@ def fetch_data(college, hours=24):
     return posts + comments
 
 def detect_topics(corpus):
-    parts_of_speech = set(['NN','JJ', 'NNS', 'JJR','RB','RBR'])
     tfidf = TFIDF(corpus).get()
-    # fused = ''.join([item.get_text() for item in corpus])
-    # ner = NER(corpus).named_entities(fused)
     relevant = set([word[0] for word in tfidf if word[1] > 0.4])
-    # entities = set([word[0] for word in ner if word[1] in parts_of_speech])
-    # intersection = relevant.intersection(entities)
-    # bigrams = recover_bigrams(relevant, entities)
     return list(relevant)
-
-def recover_bigrams(tfidf, named_entities):
-    bigrams = set()
-    for bigram in tfidf:
-        first_word = bigram.split(" ")[0]
-        if first_word in  named_entities:
-            bigrams.add(bigram)
-    return bigrams
-
-@app.route('/posts')
-def send_posts():
-    college = request.args.get('college')
-    term = request.args.get('term')
-    posts = [item.get_text() for item in text_search(college, term)]
-    return jsonify(data=posts)
-
-
-def text_search(college, term):
-    present = datetime.now()
-    past = datetime.now() - timedelta(weeks=4)
-    posts = Post.query.whoosh_search(term).filter(
-        Post.college==college,
-        Post.created.between(past, present)).all()
-    comments = Comment.query.whoosh_search(term).filter(
-        Comment.college==college,
-        Comment.created.between(past, present)).all()
-    return posts + comments
-
-
-@app.route('/usage')
-def usage():
-    college = request.args.get('college')
-    term = request.args.get('term')
-    posts = text_search(college, term)
-    data  = cluster(posts)
-    return jsonify(data=data)
-
-def cluster(posts):
-    return TimeSerializer().daily_buckets(posts)  
-# @app.route('/data/')
-# def send_data():
-#     dropdown = Post.list_colleges()
-#     colleges = request.args.getlist('colleges')
-#     term = request.args.get('term')
-#     result = []
-#     for school in colleges:
-#         corpus = query_word(school, term)
-#         buckets = bucketize(corpus, school, term)
-#         if buckets:
-#             result += buckets
-#     return render_template('line_graph.html', colleges=dropdown,
-#                                               results=jsonify(data=result))
-
-# @app.route('/<college>/<word>/<time_stamp>')
-# def word_tree(college, word, time_stamp):
-#     corpus = query_interval(college, word, time_stamp)
-#     return jsonify(data=word_tree_data(corpus))
-
-# def query_word(college, word):
-#     post_results = Post.query.whoosh_search(word).filter(Post.college==college)
-#     comments_results = Comment.query.whoosh_search(word).filter(Comment.college==college)
-#     corpus = post_results.all() + comments_results.all()
-#     return corpus
-
-# def bucketize(corpus, school, term):
-#     serializer = TimeSerializer()
-#     return serializer.weekly_buckets(corpus, school, term)
-
-# def word_tree_data(posts):
-#     corpus = ""
-#     for post in posts:
-#         if isinstance(post, Post):
-#             corpus += post.title
-#             corpus += post.text
-#         if isinstance(post, Comment):
-#             corpus += post.body
-#     return sent_tokenize(corpus)
-
-# def query_interval(college, word, time_stamp):
-#     date = datetime.fromtimestamp(float(time_stamp) / 1000)
-#     week_before = date - timedelta(weeks=1)
-#     week_after = date + timedelta(weeks=1)
-#     posts = Post.query.whoosh_search(word).filter(Post.college==college, 
-#                                                 Post.created.between(week_before, week_after))
-#     comments = Comment.query.whoosh_search(word).filter(Comment.college==college, 
-#                                                 Comment.created.between(week_before, week_after))
-#     result = posts.all()  + comments.all()
-#     return result
-
 
 if __name__ == "__main__":
     app.run(debug=True)
