@@ -22,12 +22,13 @@ function Flask($http) {
         });
     };
 
-    exports.getUsage = function(college, term) {
+    exports.getUsage = function(colleges, term) {
+        console.log(term);
         return $http({
             url: '/usage',
             method: 'GET',
             params: {
-                college: college,
+                colleges: colleges,
                 term: term
             }
         });
@@ -39,7 +40,7 @@ function Flask($http) {
             method: 'GET',
             params: {
                 college: college,
-                term: term
+                term: term,
             }
       });
     };
@@ -54,6 +55,7 @@ function Flask($http) {
             }
         });
     };
+
 
     return exports;
 }

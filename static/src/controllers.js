@@ -2,7 +2,7 @@ var app = angular.module('thrum');
 
 app.controller('TrendingController', TrendingController);
 app.controller('WordTreeController', WordTreeController);
-app.controller('SearchController', SearchController);
+app.controller('WordSearchController', WordSearchController);
 
 
 TrendingController.$inject = ['$scope', 'Flask'];
@@ -39,7 +39,7 @@ function WordTreeController($scope) {
 
 }
 
-SearchController.$inject = ['$scope'];
-function SearchController($scope) {
+WordSearchController.$inject = ['$scope'];
+function WordSearchController($scope) {
 
 }

@@ -1,0 +1,23 @@
+<div class="row">
+	<div class="col-md-6 col-md-offset-3">
+		<form class="navbar-form navbar-left" role="search">
+			<div class="form-group">
+				<input type="text" ng-model="term"  class="form-control" placeholder="Search for...">
+			</div>
+			<button type="submit" ng-click="getUsage()"class="btn btn-default">Search</button>
+		</form>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-3 search-school-list">
+		<div ng-repeat="college in colleges"class="checkbox">
+			<label>
+				<input type="checkbox" value="{{college}}" ng-click="toggle(college)" ng-checked="selection.indexOf(college) > -1">
+				{{college}}
+			</label>
+		</div>
+	</div>
+	<div class="col-md-9">
+		<h1>Test</h1>
+	</div>
+</div>

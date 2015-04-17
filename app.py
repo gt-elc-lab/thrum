@@ -2,12 +2,11 @@ import string
 from flask import Flask, json, render_template, request, jsonify
 from flask.ext.triangle import Triangle
 from nltk.tokenize import sent_tokenize
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from collection.models import Post, Comment, db
 from collection.nltk_20 import WordFrequency
 from analysis.tfidf import TFIDF
 from analysis.grams import BiGramGenerator
-from analysis.d3_formatters import ForceLayout
 from analysis.timeseries import TimeSerializer
 from analysis.ner import NER
 from collection.nltk_20 import WordFrequency
@@ -40,11 +39,26 @@ def send_posts():
 
 @app.route('/usage')
 def usage():
-    college = request.args.get('college')
+    colleges = request.args.getlist('colleges')
     term = request.args.get('term')
-    posts = text_search(college, term)
-    data  = cluster(posts)
-    return jsonify(data=data)
+    time_period = request.args.get('period')
+    response = []
+    for college in colleges: 
+        posts = text_search(college, term, time_period)
+        buckets  = cluster(posts)
+        formatted_data = format_serialized_data(buckets, college)
+        response.append({'college': college, 'values':formatted_data})
+    return jsonify(data=response)
+
+def format_serialized_data(data, college):
+    year = datetime.now().year
+    year_start = date(year,1,1)
+    formatted = []
+    for bucket, items in data:
+        time_stamp = str(year_start + timedelta(days=bucket - 1))
+        payload = {'date': time_stamp, 'count': len(list(items)), 'college': college}
+        formatted.append(payload)
+    return formatted
 
 @app.route('/content')
 def content():
@@ -76,9 +90,12 @@ def extract_relevant_sentences(term, text):
 def remove_punctionation(text):
     return ''.join([ch for ch in text if ch not in string.punctuation])
 
-def text_search(college, term):
+def text_search(college, term, cutoff=None):
     present = datetime.now()
-    past = datetime.now() - timedelta(weeks=4)
+    if cutoff:
+        past = datetime.fromtimestamp(cutoff / 1000.0)
+    else:
+        past = datetime.fromtimestamp(cutoff / 1000.0)
     posts = Post.query.whoosh_search(term).filter(
         Post.college==college,
         Post.created.between(past, present)).all()

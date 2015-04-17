@@ -22,3 +22,8 @@
 	margin-top: 10px;
 }
 
+.search-school-list {
+	height: 350px;
+	overflow-y: scroll; 
+}
+

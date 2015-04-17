@@ -52,10 +52,9 @@ class TimeSerializer(object):
     def daily_buckets(self, data):
         data = sorted(data, key=lambda x: x.created)
         buckets = itertools.groupby(data, key=lambda x: x.created.timetuple().tm_yday)
-        year = datetime.now().year
-        year_start = date(year,1,1)
-        daily = []
-        for bucket, items in buckets:
-            time_stamp = str(year_start + timedelta(days=bucket - 1))
-            daily.append({'date': time_stamp, 'count': len(list(items))})
-        return daily
+        # `
+        return buckets
+        # for bucket, items in buckets:
+        #     time_stamp = str(year_start + timedelta(days=bucket - 1))
+        #     daily.append({'date': time_stamp, 'count': len(list(items))})
+        # return daily
