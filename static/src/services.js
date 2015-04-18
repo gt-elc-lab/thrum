@@ -29,7 +29,7 @@ function Flask($http) {
             method: 'GET',
             params: {
                 colleges: colleges,
-                term: term
+                term: term,
             }
         });
     };

@@ -4,12 +4,11 @@ from flask.ext.triangle import Triangle
 from nltk.tokenize import sent_tokenize
 from datetime import datetime, timedelta, date
 from collection.models import Post, Comment, db
-from collection.nltk_20 import WordFrequency
 from analysis.tfidf import TFIDF
-from analysis.grams import BiGramGenerator
 from analysis.timeseries import TimeSerializer
 from analysis.ner import NER
 from collection.nltk_20 import WordFrequency
+
 app = Flask(__name__, static_url_path='')
 Triangle(app)
 query = db.session.query(Post)
@@ -95,7 +94,7 @@ def text_search(college, term, cutoff=None):
     if cutoff:
         past = datetime.fromtimestamp(cutoff / 1000.0)
     else:
-        past = datetime.fromtimestamp(cutoff / 1000.0)
+        past = present - timedelta(weeks=8)
     posts = Post.query.whoosh_search(term).filter(
         Post.college==college,
         Post.created.between(past, present)).all()

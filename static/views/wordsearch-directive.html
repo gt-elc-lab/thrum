@@ -1,23 +1,45 @@
 <div class="row">
-	<div class="col-md-6 col-md-offset-3">
-		<form class="navbar-form navbar-left" role="search">
-			<div class="form-group">
-				<input type="text" ng-model="term"  class="form-control" placeholder="Search for...">
+	<div class="col-md-3">
+		<div class="row text-center">
+			<!-- Text Box -->
+			<div class="">
+				<form class="navbar-form navbar-left" role="search">
+					<div class="form-group">
+						<input class="input-sm" type="text" ng-model="term"  class="form-control" placeholder="Search for...">
+					</div>
+					<button type="submit" ng-click="getUsage()"class="btn btn-default btn-sm">Search</button>
+				</form>
 			</div>
-			<button type="submit" ng-click="getUsage()"class="btn btn-default">Search</button>
-		</form>
-	</div>
-</div>
-<div class="row">
-	<div class="col-md-3 search-school-list">
-		<div ng-repeat="college in colleges"class="checkbox">
-			<label>
-				<input type="checkbox" value="{{college}}" ng-click="toggle(college)" ng-checked="selection.indexOf(college) > -1">
-				{{college}}
-			</label>
+			<!--End Text Box  -->
+			
+		</div>
+		<!-- <div class="row text-center">
+			<div class="btn-group" role="group" aria-label="...">
+				<button type="button" class="btn btn-primary btn-sm full-buffer" ng-click="setTimePeriod('day')">past day</button>
+				<button  ng-click="setTimePeriod('week')" type="button" class="btn btn-primary btn-sm full-buffer">past 7 days</button>
+				<button  ng-click="setTimePeriod('month')" type="button" class="btn btn-primary btn-sm full-buffer">past 30 days</button>
+			</div>
+		</div> -->
+		<div class="row">
+			<!-- List -->
+			<div class="">
+				<div class="search-school-list">
+					<ul  class="list-group">
+						<li ng-repeat="college in colleges" class="list-group-item">
+							<label>
+								<input type="checkbox" value="{{college}}" ng-click="toggle(college)" ng-checked="selection.indexOf(college) > -1">
+								{{college}}
+							</label>
+						</li>
+					</ul>
+					
+				</div>
+			</div>
+			<!-- End List -->
 		</div>
 	</div>
-	<div class="col-md-9">
-		<h1>Test</h1>
+	<div class="col-md-8">
+		<div  id="line-graph" class="col-md-9">
+		</div>
 	</div>
 </div>

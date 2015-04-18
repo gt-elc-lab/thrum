@@ -11,7 +11,7 @@
 }
 
 .full-buffer {
-	margin: 1px 1px 1px 1px;
+	margin: 3px 3px 3px 3px;
 }
 
 .top-buffer {
@@ -23,7 +23,7 @@
 }
 
 .search-school-list {
-	height: 350px;
+	height: 450px;
 	overflow-y: scroll; 
 }
 
