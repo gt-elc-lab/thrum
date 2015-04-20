@@ -1,1 +1,22 @@
-<p> trending</p>
+<div class="row" ng-controller="TrendingController">
+	<div class="row">
+		<div class="col-md-4">
+		<div class="text-center">
+			
+			<ul class="nav navbar-nav">
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{selected}} <span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu">
+						<li ng-repeat="college in colleges"  ng-click="getTrending(college)"><a>{{college}}</a></li>
+					</ul>
+				</li>
+			</ul>
+			
+		</div>
+		</div>
+		
+	</div>
+	<div class="row">
+		<a ng-repeat="term in trending"class="btn btn-primary btn-sm full-buffer">{{term}}</a>
+	</div>
+</div>

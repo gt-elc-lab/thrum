@@ -6,7 +6,9 @@ function WordTree() {
 
     var directive = {
         restrict: 'E',
-        scope: {},
+        scope: {
+            colleges: '=',
+        },
         templateUrl: '../views/wordtree-directive.html',
         link: link,
         controller: controller
@@ -16,21 +18,12 @@ function WordTree() {
 
     }
 
-    function controller($scope, Flask) {
-        $scope.selected;
-        $scope.colleges;
+    function controller($scope, $element, Flask) {
+        $scope.selected = 'Colleges';
+        // $scope.colleges;
         $scope.render = render;
         $scope.select = selectCollege;
-        init();
 
-        function init() {
-            Flask.getColleges().success(function(response, status) {
-                $scope.colleges = response.data;
-            })
-                .error(function(response, status) {
-                    alert('Server responsed with ' + response);
-                });
-        }
 
         function render() {
             if (!$scope.term) {
@@ -40,7 +33,7 @@ function WordTree() {
 
             Flask.getWordTreeData($scope.selected, $scope.term).success(drawWordTree)
                 .error(function(response, status) {
-
+                    alert(response);
                 });
         }
 
@@ -56,13 +49,18 @@ function WordTree() {
                 word: $scope.term,
                 type: 'double'
             };
-            var chart = new google.visualization.WordTree(document.getElementById('wordtree'));
+            var chart = new google.visualization.WordTree($element[0].getElementsByClassName('wordtree')[0]);
             chart.draw(google_data, options);
         }
 
     }
 
     return directive;
+}
+
+
+function TrendingWordTree() {
+
 }
 
 function WordSearch() {
@@ -76,13 +74,13 @@ function WordSearch() {
     };
 
     function link($scope, element, attrs) {
-        var width = 850;
-        var height = 400;
+        var width = 840;
+        var height = 450;
         var margin = {
             top: 20,
             left: 20,
             right: 20,
-            bottom: 20
+            bottom: 50
         };
 
         var svg = d3.select('#line-graph')
@@ -96,7 +94,8 @@ function WordSearch() {
             .range([height - margin.top - margin.bottom, 0]);
 
         var xScale = d3.time.scale()
-            .range([margin.left, width - margin.right]);
+            .range([margin.left, width - margin.right])
+            .rangeRound([margin.left, width - margin.right]);
 
 
         var line = d3.svg.line().interpolate('interpolate')
@@ -136,7 +135,9 @@ function WordSearch() {
             xScale.domain([xmin, xmax]);
             yScale.domain([ymin, ymax]);
             var yAxis = d3.svg.axis().scale(yScale).orient('left');
-            var xAxis = d3.svg.axis().scale(xScale).orient('bottom');
+            var xAxis = d3.svg.axis().scale(xScale).orient('bottom')
+                .tickFormat(d3.time.format('%m / %d'));
+
 
             svg.append('g')
                 .attr('class', 'x axis')
@@ -153,6 +154,7 @@ function WordSearch() {
                 .range(['red', 'blue', 'orange', 'yellow', 'green']);
 
             $scope.data.forEach(function(d, i) {
+                console.log(i);
                 svg.append("path")
                     .datum(d.values)
                     .attr("class", "line")
@@ -173,6 +175,21 @@ function WordSearch() {
                         return yScale(d.count)
                     })
                     .attr("r", 5);
+                var labelPadding = 8;
+                svg.append('rect')
+                    .attr('transform', 'translate(' + (margin.left * (i* labelPadding) + 10) + ',' + (height - margin.bottom + 10) + ')')
+                    .attr('width', 20)
+                    .attr('height', 20)
+                    .attr('fill', color(i));
+
+                 svg.append('text')
+                    // .attr('x', margin.left + 20) 
+                    // .attr('y', height - margin.bottom)
+                    .attr('transform', 'translate(' + (margin.left * (i*labelPadding) + 35) + ',' + (height - margin.bottom + 25) + ')')
+                    .attr('width', 20)
+                    .attr('height', 20)
+                    .attr('fill', color(i))
+                    .text(d.college);
             });
 
         });
@@ -213,7 +230,7 @@ function WordSearch() {
                 alert('Please select a college and enter a term');
             }
             Flask.getUsage($scope.selection, $scope.term)
-            .success(function(response, status) {
+                .success(function(response, status) {
                     $scope.data = response.data;
                 })
                 .error(function(response, status) {

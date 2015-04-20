@@ -1,4 +1,14 @@
 <div class="container" ng-controller="WordTreeController">
-	<word-tree>
-	</word-tree>
-</div>	
+	<div class="row text-center">
+		<button ng-click="addInstance()" type="button" class="btn btn-default btn-sm" aria-label="Left Align">
+		<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+		</button>
+		<button ng-click="removeInstance()" type="button" class="btn btn-default btn-sm" aria-label="Left Align">
+		<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+		</button>
+	</div>
+	<div class="row">
+		<word-tree ng-repeat="wordtree in instances track by $index" colleges="colleges">
+		</word-tree>
+	</div>
+</div>

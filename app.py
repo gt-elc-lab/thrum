@@ -94,10 +94,10 @@ def text_search(college, term, cutoff=None):
     if cutoff:
         past = datetime.fromtimestamp(cutoff / 1000.0)
     else:
-        past = present - timedelta(weeks=8)
+        past = present - timedelta(weeks=4)
     posts = Post.query.whoosh_search(term).filter(
-        Post.college==college,
-        Post.created.between(past, present)).all()
+            Post.college==college,
+            Post.created.between(past, present)).all()
     comments = Comment.query.whoosh_search(term).filter(
         Comment.college==college,
         Comment.created.between(past, present)).all()
@@ -106,7 +106,7 @@ def text_search(college, term, cutoff=None):
 def cluster(posts):
     return TimeSerializer().daily_buckets(posts)  
 
-def fetch_data(college, hours=24):
+def fetch_data(college, hours=48):
     today = datetime.now()
     two_days_ago = today - timedelta(hours=hours)
     posts = Post.query.filter(
@@ -120,7 +120,7 @@ def fetch_data(college, hours=24):
 
 def detect_topics(corpus):
     tfidf = TFIDF(corpus).get()
-    relevant = set([word[0] for word in tfidf if word[1] > 0.4])
+    relevant = set([word[0] for word in tfidf if word[1] > 0.5])
     return list(relevant)
 
 if __name__ == "__main__":
