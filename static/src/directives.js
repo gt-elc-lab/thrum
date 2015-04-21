@@ -78,7 +78,7 @@ function WordSearch() {
         var height = 450;
         var margin = {
             top: 20,
-            left: 20,
+            left: 30,
             right: 20,
             bottom: 50
         };
@@ -120,7 +120,7 @@ function WordSearch() {
                 college.values.forEach(function(d) {
                     ymin = (d.count < ymin) ? ymin = d.count : ymin = ymin;
                     ymax = (d.count > ymax) ? ymax = d.count : ymax = ymax;
-
+                    console.log(d.count);
                     var date = new Date(d.date);
                     if (!xmin || !xmax) {
                         xmin = date;
@@ -134,7 +134,8 @@ function WordSearch() {
 
             xScale.domain([xmin, xmax]);
             yScale.domain([ymin, ymax]);
-            var yAxis = d3.svg.axis().scale(yScale).orient('left');
+            var yAxis = d3.svg.axis().scale(yScale).orient('left')
+                .tickFormat(d3.format(".0%"));
             var xAxis = d3.svg.axis().scale(xScale).orient('bottom')
                 .tickFormat(d3.time.format('%m / %d'));
 
@@ -153,8 +154,15 @@ function WordSearch() {
                 .domain([0, $scope.data.length - 1])
                 .range(['red', 'blue', 'orange', 'yellow', 'green']);
 
+            // remove any previous lines and points
+            svg.selectAll(".line").remove();
+            svg.selectAll("circle").remove();
+            svg.selectAll(".label").remove();
+            svg.selectAll('rect').remove();
+            svg.selectAll(".y.axis").transition().duration(1500).call(yAxis);
+            svg.selectAll(".x.axis").transition().duration(1500).call(xAxis);
             $scope.data.forEach(function(d, i) {
-                console.log(i);
+                 
                 svg.append("path")
                     .datum(d.values)
                     .attr("class", "line")
@@ -175,6 +183,7 @@ function WordSearch() {
                         return yScale(d.count)
                     })
                     .attr("r", 5);
+
                 var labelPadding = 8;
                 svg.append('rect')
                     .attr('transform', 'translate(' + (margin.left * (i* labelPadding) + 10) + ',' + (height - margin.bottom + 10) + ')')
@@ -183,8 +192,7 @@ function WordSearch() {
                     .attr('fill', color(i));
 
                  svg.append('text')
-                    // .attr('x', margin.left + 20) 
-                    // .attr('y', height - margin.bottom)
+                     .attr('class', 'label')
                     .attr('transform', 'translate(' + (margin.left * (i*labelPadding) + 35) + ',' + (height - margin.bottom + 25) + ')')
                     .attr('width', 20)
                     .attr('height', 20)
