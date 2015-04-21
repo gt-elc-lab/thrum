@@ -58,8 +58,9 @@ def format_serialized_data(data, college):
         offset = time_stamp - timedelta(days=1)
         post_total = Post.query.filter(Post.college==college, Post.created.between(offset, time_stamp)).count()
         comment_total = Comment.query.filter(Comment.college==college, Comment.created.between(offset, time_stamp)).count()
-        total = float(post_total + comment_total) or 1
-        payload = {'date': str(time_stamp), 'count': (len(list(items)) / total), 'college': college}
+        appeared = len(list(items))
+        total = float(post_total + comment_total) or appeared
+        payload = {'date': str(time_stamp), 'count': (appeared / total), 'college': college}
         formatted.append(payload)
     return formatted
 

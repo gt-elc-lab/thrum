@@ -148,7 +148,13 @@ function WordSearch() {
             svg.append('g')
                 .attr('class', 'y axis')
                 .attr('transform', 'translate(' + margin.left + ',' + 0 + ')')
-                .call(yAxis);
+                .call(yAxis)
+                .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("% Of Posts + Comments");
 
             var color = d3.scale.linear()
                 .domain([0, $scope.data.length - 1])
